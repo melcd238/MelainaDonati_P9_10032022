@@ -80,21 +80,40 @@ describe("Given I am connected as an employee", () => {
     })
         // Test d'integration pour getBills
         describe("When I am on Bills Page ", ()=>{
-          test("fetch bills from API MOCKS should return mockedList ",  ()=>{
-           // const getBills = jest.spyOn(store , "bills")
-           // const bills =  store.bills();
-           // expect(getBills).toHaveBeenCalledTimes(1);
-           // expect(bills).toBeDefined();
-           // doit me retourner un tableau de longueur 4 sauf que mockedBills return {}
+          test("fetches bills from mock API GET", async  ()=>{
+            await waitFor(() => screen.getByText("Mes notes de frais"))
            })
-           test("fetch bills fail from API should return 404 error message ", ()=>{
-    
+           describe("When an error occurs on API", ()=>{
+              beforeEach(()=>{
+              jest.spyOn(store, "bills")
+              })
+              test("fetches bills from an API and fails with 404 message error", async () => {
+
+                store.bills.mockImplementationOnce(() => {
+                  return {
+                    list : () =>  {
+                      return Promise.reject(new Error("Erreur 404"))
+                    }
+                  }})
+                await new Promise(process.nextTick);
+                const message = await screen.getByText(/Erreur 404/)
+                expect(message).toBeTruthy()
+              }) 
+              test("fetches messages from an API and fails with 500 message error", async () => {
+
+                store.bills.mockImplementationOnce(() => {
+                  return {
+                    list : () =>  {
+                      return Promise.reject(new Error("Erreur 500"))
+                    }
+                  }})
+          
+                await new Promise(process.nextTick);
+                const message = await screen.getByText(/Erreur 500/)
+                expect(message).toBeTruthy()
+              })
+            }) 
            })
-           test("internal error from server should return 500 error message", ()=>{
-             
-           })
-        })
+ })
 
 
-    
-})
