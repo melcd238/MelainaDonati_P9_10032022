@@ -18,7 +18,7 @@ export default class {
 
   handleClickNewBill = () => {
     this.onNavigate(ROUTES_PATH['NewBill'])
-  }
+  } 
 
   handleClickIconEye = (icon) => {
     const billUrl = icon.getAttribute("data-bill-url")

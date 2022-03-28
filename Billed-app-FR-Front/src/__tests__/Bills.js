@@ -5,12 +5,11 @@
 import {screen, waitFor} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
+import {ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
 import userEvent from "@testing-library/user-event";
 import '@testing-library/jest-dom';
-
 import router from "../app/Router.js";
 
 describe("Given I am connected as an employee", () => {
@@ -54,5 +53,28 @@ describe("Given I am connected as an employee", () => {
       expect(handleClickIconEye).toBeCalled();
       expect(screen.getByText('Justificatif')).toBeInTheDocument();// besoin d'importer import '@testing-library/jest-dom' pour utiliser toBeInTheDocument();
     })
+    
   })
+    // Test "nouvelle note de frais" is clicked I should be in new page
+    describe('When I am on Bills Page and I click getNewBill btn', ()=>{
+      test("Then it should render form to new bill ", ()=>{
+        document.body.innerHTML = BillsUI({ data: bills })
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const newBills = new Bills ({
+          document,
+          onNavigate,
+        })
+       
+        const buttonNewBill = screen.getByTestId('btn-new-bill')
+        const handleClickNewBill = jest.fn(newBills.handleClickNewBill);
+        buttonNewBill.addEventListener('click',handleClickNewBill)
+        userEvent.click(buttonNewBill);
+        expect(handleClickNewBill).toHaveBeenCalled();
+        expect(screen.getByTestId("form-new-bill")).toBeInTheDocument()
+       
+      })
+    })
+    
 })
