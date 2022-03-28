@@ -11,6 +11,8 @@ import Bills from "../containers/Bills.js";
 import userEvent from "@testing-library/user-event";
 import '@testing-library/jest-dom';
 import router from "../app/Router.js";
+import  store  from "../__mocks__/store.js";
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -76,5 +78,23 @@ describe("Given I am connected as an employee", () => {
        
       })
     })
+        // Test d'integration pour getBills
+        describe("When I am on Bills Page ", ()=>{
+          test("fetch bills from API MOCKS should return mockedList ",  ()=>{
+           // const getBills = jest.spyOn(store , "bills")
+           // const bills =  store.bills();
+           // expect(getBills).toHaveBeenCalledTimes(1);
+           // expect(bills).toBeDefined();
+           // doit me retourner un tableau de longueur 4 sauf que mockedBills return {}
+           })
+           test("fetch bills fail from API should return 404 error message ", ()=>{
+    
+           })
+           test("internal error from server should return 500 error message", ()=>{
+             
+           })
+        })
+
+
     
 })
