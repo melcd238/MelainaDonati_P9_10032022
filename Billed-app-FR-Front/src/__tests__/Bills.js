@@ -1,20 +1,19 @@
 /**
  * @jest-environment jsdom
  */
-
+ import '@testing-library/jest-dom';
+ import userEvent from "@testing-library/user-event";
 import {screen, waitFor} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
-import { bills } from "../fixtures/bills.js"
-import {ROUTES, ROUTES_PATH} from "../constants/routes.js";
-import {localStorageMock} from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
-import userEvent from "@testing-library/user-event";
-import '@testing-library/jest-dom';
-import router from "../app/Router.js";
-import mockStore from "../__mocks__/store";
+import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import { localStorageMock } from "../__mocks__/localStorage.js"
+import mockStore from "../__mocks__/store"
+import { bills } from "../fixtures/bills"
+import router from "../app/Router"
 
 
-//jest.mock("../app/store", () => mockStore)
+jest.mock("../app/store", () => mockStore)
 
 
 
@@ -80,10 +79,6 @@ describe("Given I am a user connected as Employee", () => {
       expect(windowNoteFrais).toBeInTheDocument()
       const windowTbody = await screen.getByTestId("tbody")
       expect(windowTbody).toBeInTheDocument()
-      const contentDate  = await screen.getByText("Date")
-      expect(contentDate).toBeInTheDocument()
-      const contentStatut  = await screen.getByText("Statut")
-      expect(contentStatut).toBeInTheDocument()
       
     })
   describe("When an error occurs on API", () => {
