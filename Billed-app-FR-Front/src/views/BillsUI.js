@@ -9,7 +9,7 @@ const row = (bill) => {
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td>
+      <td>${bill.formatedDate ?? bill.date}</td>
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
@@ -19,12 +19,19 @@ const row = (bill) => {
     `)
   }
 
-const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
-}
+  
+  
+  
+  const rows = (data) => {
+    return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+  }
+  
+  
+
+ 
 
 export default ({ data: bills, loading, error }) => {
-  
+
   const modal = () => (`
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -46,18 +53,24 @@ export default ({ data: bills, loading, error }) => {
     return LoadingPage()
   } else if (error) {
     return ErrorPage(error)
-  }
 
-    // Fix bug display bills by date
-    let sortBills;
-    if(bills){
-    const sortByMapped = (map,compareFn) => (a,b) => -compareFn(map(a),map(b));
-    const toDate = e => new Date(e.date);
-    const byValue = (a, b) => a-b;
-    const byDate = sortByMapped(toDate, byValue);
-    sortBills = [...bills].sort(byDate);
-    console.log(sortBills);
-    }
+  }
+        
+        // Fix bug display bills by date
+        let sortBills;
+        if(bills){
+        const sortByMapped = (map,compareFn) => (a,b) => -compareFn(map(a),map(b));
+        const toDate = e => new Date(e.date);
+        const byValue = (a, b) => a-b;
+        const byDate = sortByMapped(toDate, byValue);
+        sortBills = [...bills].sort(byDate);
+        console.log(sortBills);
+        }
+        
+        
+
+  
+
   
   return (`
     <div class='layout'>
@@ -80,7 +93,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(sortBills)}
+            ${rows(sortBills)} 
           </tbody>
           </table>
         </div>

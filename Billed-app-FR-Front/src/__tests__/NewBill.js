@@ -21,12 +21,40 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-// Test pour l'extension du fichier incorrect 
+// Tests pour l'extension du fichier 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 window.localStorage.setItem('user', JSON.stringify({
   type: 'Employee'
 }))
 
+// extension fichier correct
+describe("Given I am connected as an employee", ()=>{
+  describe("When I am on NewBill Page, and file extension is ok",() =>{
+    test("Then we can NOT have an error message", ()=>{
+        document.body.innerHTML = NewBillUI()
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        const newBill = new NewBill({
+          document,
+          onNavigate,
+          store: null,
+          localStorage: window.localStorage 
+        })
+        const handleChangeFile = jest.fn(() => newBill.handleChangeFile)
+        const inputFile = screen.getByTestId("file")
+        inputFile.addEventListener("change", handleChangeFile)
+        fireEvent.change(inputFile, {
+          target: {
+              files: [new File(["test.jpg"], "test.jpg", { type: "image/jpg" })],
+          }
+      })
+        expect(screen.queryByTestId('error')).not.toBeInTheDocument();
+    })
+
+  })
+})
+// extension fichier incorrect
 describe("Given I am connected as an employee", ()=>{
   describe("When I am on NewBill Page, and file extension is wrong",() =>{
     test("Then we can have an error message", ()=>{
@@ -54,6 +82,9 @@ describe("Given I am connected as an employee", ()=>{
 
   })
 })
+
+
+
 
  /*
  describe("Given I am connected as an employee", () => {
