@@ -43,7 +43,8 @@ export default class NewBill {
             }).catch(error => console.error(error))
           } else {
              let error = document.createElement('p');
-             error.innerText = 'Vous devez choisir entre ces formats suivant : .png ou .jpeg ou .jpg';
+             error.setAttribute('data-testid', 'error')
+             error.innerText = 'Vous devez choisir entre les formats suivant : .png ou .jpeg ou .jpg';
              e.target.parentNode.append(error);
           }
         
