@@ -1,13 +1,17 @@
 /**
  * @jest-environment jsdom
  */
- import '@testing-library/jest-dom'
+import '@testing-library/jest-dom'
 import {fireEvent, screen, waitFor } from "@testing-library/dom"
+import userEvent from "@testing-library/user-event";
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
+import mockStore from "../__mocks__/store"
 import router from "../app/Router"
+
+jest.mock("../app/store", () => mockStore)
 
 
 
@@ -46,44 +50,61 @@ describe("Given I am connected as an employee", () => {
 })
 
 
-
-
-
-// extension fichier incorrect
+// Tests pour l'extension du fichier : toujours erreurs sur le deuxième test même si prise en compte que l'eventListener est déjà dans le constructeur
 describe("Given I am connected as an employee", ()=>{
-  describe("When I am on NewBill Page, and file extension is wrong",() =>{
-    test("Then we can have an error message", ()=>{
+  let newBill;
+  beforeEach(() => {
+    const dom = NewBillUI();
+    document.body.innerHTML = dom;
 
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-       window.localStorage.setItem('user', JSON.stringify({
-      type: 'Employee'
-      }))
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
 
-        document.body.innerHTML = NewBillUI()
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-        const newBill = new NewBill({
-          document,
-          onNavigate,
-          store: null,
-          localStorage: window.localStorage 
-        })
-        const handleChangeFile = jest.fn(() => newBill.handleChangeFile)
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+
+    newBill = new NewBill({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
+  });
+
+
+  describe("When I am on NewBill Page, and I upload a file",() =>{
+    test("Then if it is not a good file, it should display an error message", ()=>{
+      const fileTest = new File(["test.gif"], "test.gif", { type: "image/gif" })
+        const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
         const inputFile = screen.getByTestId("file")
         inputFile.addEventListener("change", handleChangeFile)
-        fireEvent.change(inputFile, {
-          target: {
-            files: [new File(["test.gif"], "test.gif", { type: "image/gif" })],
-          }
-      })
-      const errorMessage = screen.getByTestId('error')
+        userEvent.upload(inputFile,fileTest)
+       expect(handleChangeFile).toHaveBeenCalled()
+      const errorMessage = screen.getAllByTestId('error')
       expect(errorMessage).toBeTruthy();
         
     })
-
+    
+    test("Then if it is  a good file, it should upload file", ()=>{
+      const fileTest = new File(["test.jpg"], "test.jpg", { type: "image/jpg" })
+     
+      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
+      const inputFile = screen.getByTestId("file");
+      inputFile.addEventListener("change", handleChangeFile);
+      userEvent.upload(inputFile, fileTest )
+      expect(handleChangeFile).toHaveBeenCalled()
+      expect(inputFile.files[0]).toStrictEqual(fileTest)
+    })
   })
 })
+
+
 
 // test pour simuler un formulaire valide et retour sur la page Bills 
 describe("Given I am connected as an employee", ()=>{
@@ -136,42 +157,43 @@ describe("Given I am connected as an employee", ()=>{
   })
 })
 
-// Tests pour l'extension du fichier 
 
-// extension fichier correct
-/*
-describe("Given I am connected as an employee", ()=>{
-  describe("When I am on NewBill Page, and file extension is ok",() =>{
-    test("Then we can NOT have an error message", ()=>{
-
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+// Test d'intégration POST
+/*describe("Given I am a user connected as Employee", () => {
+  describe("When I am on  NEWBills Page", () => {
+    test("fetches bills from mock API POST", async () => {
+      jest.spyOn(mockStore, "bills")
+      Object.defineProperty(
+          window,
+          'localStorage',
+          { value: localStorageMock }
+      )
       window.localStorage.setItem('user', JSON.stringify({
-     type: 'Employee'
-     }))
+        type: 'Employee',
+        email: "a@a"
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.appendChild(root)
+      router()
+      mockStore.bills.mockImplementationOnce(() => {
 
-        document.body.innerHTML = NewBillUI()
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-        const newBill = new NewBill({
-          document,
-          onNavigate,
-          store: null,
-          localStorage: window.localStorage 
-        })
-        const handleChangeFile = jest.fn(() => newBill.handleChangeFile)
-        const inputF = screen.getByTestId("file")
-        inputF.addEventListener("change", handleChangeFile)
-        fireEvent.change(inputF, {
-          target: {
-              files: [new File(["test.jpg"], "test.jpg", { type: "image/jpg" })],
+        return {
+          create : (bill) =>  {
+            return Promise.resolve({  test  })
           }
-      })
-      //  expect(screen.queryByTestId('error')).not.toBeInTheDocument();
+        }})
+      window.onNavigate(ROUTES_PATH.Bills)
+      await new Promise(process.nextTick);  
     })
-
   })
 })
 */
+
+
+
+
+
+
 
 
