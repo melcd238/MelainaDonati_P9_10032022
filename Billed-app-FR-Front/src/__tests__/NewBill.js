@@ -79,6 +79,17 @@ describe("Given I am connected as an employee", ()=>{
 
 
   describe("When I am on NewBill Page, and I upload a file",() =>{
+    test("Then if it is  a good file, it should upload file", ()=>{
+      const fileTest = new File(["test.jpg"], "test.jpg", { type: "image/jpg" })
+     
+      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
+      const inputFile = screen.getByTestId("file");
+      inputFile.addEventListener("change", handleChangeFile);
+      userEvent.upload(inputFile, fileTest )
+      expect(handleChangeFile).toHaveBeenCalled()
+      expect(inputFile.files[0]).toStrictEqual(fileTest)
+    })
+
     test("Then if it is not a good file, it should display an error message", ()=>{
       const fileTest = new File(["test.gif"], "test.gif", { type: "image/gif" })
         const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
@@ -91,16 +102,7 @@ describe("Given I am connected as an employee", ()=>{
         
     })
     
-    test("Then if it is  a good file, it should upload file", ()=>{
-      const fileTest = new File(["test.jpg"], "test.jpg", { type: "image/jpg" })
-     
-      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e));
-      const inputFile = screen.getByTestId("file");
-      inputFile.addEventListener("change", handleChangeFile);
-      userEvent.upload(inputFile, fileTest )
-      expect(handleChangeFile).toHaveBeenCalled()
-      expect(inputFile.files[0]).toStrictEqual(fileTest)
-    })
+
   })
 })
 
@@ -158,11 +160,11 @@ describe("Given I am connected as an employee", ()=>{
 })
 
 
-// Test d'intégration POST
-/*describe("Given I am a user connected as Employee", () => {
+// Test d'intégration POST ( reste à espionner le update )
+describe("Given I am a user connected as Employee", () => {
   describe("When I am on  NEWBills Page", () => {
     test("fetches bills from mock API POST", async () => {
-      jest.spyOn(mockStore, "bills")
+    // const spyUpdate = jest.spyOn(mockStore,"bills","update")
       Object.defineProperty(
           window,
           'localStorage',
@@ -176,19 +178,14 @@ describe("Given I am connected as an employee", ()=>{
       root.setAttribute("id", "root")
       document.body.appendChild(root)
       router()
-      mockStore.bills.mockImplementationOnce(() => {
-
-        return {
-          create : (bill) =>  {
-            return Promise.resolve({  test  })
-          }
-        }})
       window.onNavigate(ROUTES_PATH.Bills)
-      await new Promise(process.nextTick);  
+     // expect(spyUpdate).toHaveBeenCalled();
+      const billsPage = screen.getByTestId('tbody') 
+      expect(billsPage).toBeInTheDocument()
     })
   })
 })
-*/
+
 
 
 
