@@ -50,7 +50,7 @@ describe("Given I am connected as an employee", () => {
 })
 
 
-// Tests pour l'extension du fichier : toujours erreurs sur le deuxième test même si prise en compte que l'eventListener est déjà dans le constructeur
+// Tests pour l'extension du fichier :
 describe("Given I am connected as an employee", ()=>{
   let newBill;
   beforeEach(() => {
@@ -72,7 +72,7 @@ describe("Given I am connected as an employee", ()=>{
     newBill = new NewBill({
       document,
       onNavigate,
-      store: null,
+      store: mockStore,
       localStorage: window.localStorage,
     });
   });
@@ -160,11 +160,11 @@ describe("Given I am connected as an employee", ()=>{
 })
 
 
-// Test d'intégration POST ( reste à espionner le update )
+// Test d'intégration POST 
 describe("Given I am a user connected as Employee", () => {
   describe("When I am on  NEWBills Page", () => {
     test("fetches bills from mock API POST", async () => {
-    // const spyUpdate = jest.spyOn(mockStore,"bills","update")
+     const spyUpdate = jest.spyOn(mockStore.bills(),"update")
       Object.defineProperty(
           window,
           'localStorage',
@@ -174,12 +174,22 @@ describe("Given I am a user connected as Employee", () => {
         type: 'Employee',
         email: "a@a"
       }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.appendChild(root)
-      router()
-      window.onNavigate(ROUTES_PATH.Bills)
-     // expect(spyUpdate).toHaveBeenCalled();
+      document.body.innerHTML = NewBillUI()
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage 
+      })
+      const form = screen.getByTestId('form-new-bill')
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      form.addEventListener('click', handleSubmit)
+      fireEvent.click(form)
+       expect(handleSubmit).toHaveBeenCalled()
+      expect(spyUpdate).toHaveBeenCalled();
       const billsPage = screen.getByTestId('tbody') 
       expect(billsPage).toBeInTheDocument()
     })
